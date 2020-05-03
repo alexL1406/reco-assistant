@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="reco-assistant",
-    version="0.1.0",
+    version="0.2.0",
     author="alexL1406",
     author_email="leurent.alexis@gmail.com",
     description="Reco-Assistant",
@@ -21,6 +21,7 @@ setuptools.setup(
 
 
 install_requires = [
-   'pyaudio'
-   'wave'
+    'pyaudio'
+    'wave'
+    'request'
 ]

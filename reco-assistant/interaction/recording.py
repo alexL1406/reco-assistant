@@ -5,10 +5,11 @@ import pyaudio
 import wave
 import threading
 import pathlib
+from utils.google_handle import GoogleHandle
+import base64
 
 
 class RecognitionStates:
-
     SPEECH_DETECTION = "Speech Detection"
     RECORDING = "Recording"
     PROCESSING = "Processing"
@@ -22,29 +23,33 @@ class Recording(object):
         self.chunk = 1024  # Record in chunks of 1024 samples
         self.sample_format = pyaudio.paInt16  # 16 bits per sample
         self.channels = 4
-        self.fs = 44100  # Record at 44100 samples per second
+        self.sample_frequency = 44100  # Record at 44100 samples per second
         self.recognition_state = RecognitionStates.IDLE
         self.stream = None
         self.pyAudio_interface = pyaudio.PyAudio()  # Create an interface to PortAudio
-        self.filename = str(pathlib.Path.home())+"/.local/share/speech.wav"
+        self.filename = str(pathlib.Path.home()) + "/.local/share/speech.wav"
         self.audio_fragment_array = []  # Initialize array to store frames
 
         self.DELTA_RECORDING = 0.2
-        self.initial_audio_length = int(self.DELTA_RECORDING * self.fs / self.chunk)
+        self.initial_audio_length = int(self.DELTA_RECORDING * self.sample_frequency / self.chunk)
         self.previous_rms = 0
 
         self.RMS_THRESHOlD_UP = 2
         self.RMS_THRESHOlD_DOWN = -0.6
-        self.recording_thread = threading.Thread(target=self.start_recording())
+
+        # self.recording_thread = threading.Thread(target=self.start_recording())
         self.detect_bos_thread = None
         self.detect_eos_thread = None
+        self.write_to_files_thread = None
+
+        self.google_handle = GoogleHandle()
 
     def start_recording(self):
         print("Initialize Audio Stream")
         self.stream = self.pyAudio_interface.open(
             format=self.sample_format,
             channels=self.channels,
-            rate=self.fs,
+            rate=self.sample_frequency,
             frames_per_buffer=self.chunk,
             input=True)
 
@@ -75,7 +80,13 @@ class Recording(object):
                 self.detect_eos_thread = threading.Thread(target=lambda: self.detect_eos(fragment))
                 self.detect_eos_thread.start()
 
-        self.stop_recording()
+
+        audio_bytes = self.stop_recording()
+
+        self.write_to_files_thread = threading.Thread(target=lambda: self.write_to_file(audio_bytes))
+        self.write_to_files_thread.start()
+
+        return self.get_recognition_result()
 
     def start_recording_thread(self):
         self.recording_thread.start()
@@ -113,7 +124,6 @@ class Recording(object):
 
     def stop_recording(self):
         print('Finished recording')
-        self.switch_recording_state(RecognitionStates.IDLE)
 
         # Stop and close the stream
         self.stream.stop_stream()
@@ -121,11 +131,40 @@ class Recording(object):
         # Terminate the PortAudio interface
         self.pyAudio_interface.terminate()
 
+        return b''.join(self.audio_fragment_array)
+
+    def write_to_file(self, audio_bytes):
+
         print('Writing in file')
         # Save the recorded data as a WAV file
         wf = wave.open(self.filename, 'wb')
         wf.setnchannels(self.channels)
         wf.setsampwidth(self.pyAudio_interface.get_sample_size(self.sample_format))
-        wf.setframerate(self.fs)
-        wf.writeframes(b''.join(self.audio_fragment_array))
+        wf.setframerate(self.sample_frequency)
+        wf.writeframes(audio_bytes)
         wf.close()
+
+    def get_recognition_result(self):
+
+        print("Convert bytes to 1 channel")
+        audio_bytes_4channels = b''.join(self.audio_fragment_array)
+        audio_bytes_2channels = audioop.tomono(audio_bytes_4channels, 2, 0.5, 0.5)
+        audio_bytes_1channel = audioop.tomono(audio_bytes_2channels, 2, 0.5, 0.5)
+
+        print("Start speech interaction request to google")
+        request_result = self.google_handle.speech_to_text_api(base64.b64encode(audio_bytes_1channel)
+                                                               , self.sample_frequency)
+
+        if request_result.status_code == 200:
+            json_result = request_result.json()
+            print(json_result)
+            recognition_result = str(json_result['results'][0]['alternatives'][0]['transcript'])
+            confidence_result = float(json_result['results'][0]['alternatives'][0]['confidence'])
+
+            print("Request succeed, result: {}, confidence: {}".format(recognition_result, confidence_result))
+            return recognition_result, confidence_result
+
+        else:
+            print("Request failed: status code: {}, error:{}".format(request_result.status_code,
+                                                                     request_result.reason))
+            return None

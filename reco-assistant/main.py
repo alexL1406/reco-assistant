@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from recognition.recording import Recording
+from interaction.recording import Recording
+from utils.google_handle import GoogleHandle
 import threading
 import time
 
@@ -10,4 +11,4 @@ if __name__ == '__main__':
 
     print("Run the recording")
 
-    recording.start_recording()
+    result = recording.start_recording()
