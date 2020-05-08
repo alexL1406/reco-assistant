@@ -16,7 +16,7 @@ class RecognitionStates:
     IDLE = "IDLE"
 
 
-class Recording(object):
+class Recognition(object):
 
     def __init__(self):
         super().__init__()
@@ -30,7 +30,7 @@ class Recording(object):
         self.filename = str(pathlib.Path.home()) + "/.local/share/speech.wav"
         self.audio_fragment_array = []  # Initialize array to store frames
 
-        self.DELTA_RECORDING = 0.2
+        self.DELTA_RECORDING = 0.3
         self.initial_audio_length = int(self.DELTA_RECORDING * self.sample_frequency / self.chunk)
         self.previous_rms = 0
 
@@ -160,9 +160,10 @@ class Recording(object):
             print(json_result)
             recognition_result = str(json_result['results'][0]['alternatives'][0]['transcript'])
             confidence_result = float(json_result['results'][0]['alternatives'][0]['confidence'])
+            language_result = json_result['results'][0]['languageCode']
 
             print("Request succeed, result: {}, confidence: {}".format(recognition_result, confidence_result))
-            return recognition_result, confidence_result
+            return recognition_result, confidence_result, language_result
 
         else:
             print("Request failed: status code: {}, error:{}".format(request_result.status_code,

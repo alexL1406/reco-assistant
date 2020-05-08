@@ -1,14 +1,16 @@
 # -*- coding: utf-8 -*-
 
-from interaction.recording import Recording
+from interaction.conversation import Conversation
 from utils.google_handle import GoogleHandle
 import threading
 import time
 
 if __name__ == '__main__':
 
-    recording = Recording()
+    print("Init Conversation ")
 
-    print("Run the recording")
+    conversation = Conversation()
 
-    result = recording.start_recording()
+    print("Start Conversation")
+
+    conversation.start_interaction()
