@@ -2,7 +2,7 @@
 
 ## Description 
 
-The objective of this project is to create an vocal assistant using the Raspberry P4 and the Respeaker 4-mic array
+The objective of this project is to create a vocal assistant using the Raspberry Pi 4 and the Respeaker 4-mic array
 
 The language used is Python 3.6
 
