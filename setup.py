@@ -10,13 +10,13 @@ install_requires = required
 
 setuptools.setup(
     name="reco-assistant",
-    version="0.5.1",
+    version="0.5.2",
     author="alexL1406",
     author_email="leurent.alexis@gmail.com",
     description="Reco-Assistant",
     long_description=README,
     long_description_content_type="text/markdown",
-    url="",
+    url="https://github.com/alexL1406/reco-assistant.git",
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",

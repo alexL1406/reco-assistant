@@ -4,24 +4,23 @@
 
 The objective of this project is to create an vocal assistant using the Raspberry P4 and the Respeaker 4-mic array
 
-The language used is Python 3.5
+The language used is Python 3.6
 
 ## Protocol
 
-Install ffmpeg, portaudio19-dev
+Install ffmpeg, portaudio19-dev, ibasound-dev, mpg123
 
 `sudo apt install ffmpeg`
-`apt-get install portaudio19-dev`
-`sudo apt-get install libasound-dev`
+`sudo apt install portaudio19-dev`
+`sudo apt- install libasound-dev`
+`sudo apt install mpg123`
 
 
 Download portaudio from http://portaudio.com/download.html
 
-tar -zxvf [portaudio.tgz]
-
+`tar -zxvf [portaudio.tgz]
 Enter the directory, ./configure && make
+sudo make install`
 
-sudo make install
 
-sudo apt install mpg123
 
