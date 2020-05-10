@@ -1,0 +1,5 @@
+pyaudio
+wave
+request
+pydub
+simplejson
