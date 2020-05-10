@@ -44,7 +44,7 @@ class MinuteurChatBot(ChatBotStucture):
 
             self.run_behavior(lambda: self.minuteur.start_minuteur())
 
-            return "Je lance un minuteur de {} {}".format(list_duration[0], list_time_unity[0])
+            return "c'est parti pour {} {}".format(list_duration[0], list_time_unity[0])
 
 
 

@@ -3,6 +3,8 @@ from interaction.chatbots.minuteur_chatbot import MinuteurChatBot
 from utils.minuteur import Minuteur
 from utils.google_handle import GoogleHandle
 
+import base64
+
 class Conversation(object):
 
     def __init__(self, audio_player):
@@ -13,6 +15,7 @@ class Conversation(object):
         self.keyword_list = []
 
         self.minuteur = Minuteur(self.audio_player)
+        self.google_hangle = GoogleHandle()
 
         self.set_configuration()
 
@@ -26,20 +29,16 @@ class Conversation(object):
 
         print(self.keyword_list)
 
+        answer = ""
+
         for index, keyword in enumerate(self.keyword_list):
             if keyword+ " " in result:
                 print("start chatbot with keyword {}".format(keyword))
                 chatbot = self.chatbots_list[index]
                 answer = self.chatbots_list[index].get_answer(result, language)
 
-                print(answer)
-
-
-
-
-
-
-
-
-
+        if answer:
+            print(answer)
+            answer_wav = base64.b64decode(self.google_hangle.text_to_speech_api(answer, language).encode('ascii'))
+            self.audio_player.play_from_wav_content(answer_wav)
 

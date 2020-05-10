@@ -152,20 +152,18 @@ class Recognition(object):
         audio_bytes_1channel = audioop.tomono(audio_bytes_2channels, 2, 0.5, 0.5)
 
         print("Start speech interaction request to google")
-        request_result = self.google_handle.speech_to_text_api(base64.b64encode(audio_bytes_1channel)
+        request_json = self.google_handle.speech_to_text_api(base64.b64encode(audio_bytes_1channel)
                                                                , self.sample_frequency)
 
-        if request_result.status_code == 200:
-            json_result = request_result.json()
-            print(json_result)
-            recognition_result = str(json_result['results'][0]['alternatives'][0]['transcript'])
-            confidence_result = float(json_result['results'][0]['alternatives'][0]['confidence'])
-            language_result = json_result['results'][0]['languageCode']
+        if request_json:
+            print(request_json)
+            recognition_result = str(request_json['results'][0]['alternatives'][0]['transcript'])
+            confidence_result = float(request_json['results'][0]['alternatives'][0]['confidence'])
+            language_result = request_json['results'][0]['languageCode']
 
             print("Request succeed, result: {}, confidence: {}".format(recognition_result, confidence_result))
             return recognition_result, confidence_result, language_result
 
         else:
-            print("Request failed: status code: {}, error:{}".format(request_result.status_code,
-                                                                     request_result.reason))
+
             return None
