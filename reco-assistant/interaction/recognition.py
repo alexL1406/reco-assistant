@@ -44,7 +44,7 @@ class Recognition(object):
 
         self.google_handle = GoogleHandle()
 
-    def start_recording(self):
+    def start_recognition(self):
         print("Initialize Audio Stream")
         self.stream = self.pyAudio_interface.open(
             format=self.sample_format,
@@ -153,17 +153,19 @@ class Recognition(object):
 
         print("Start speech interaction request to google")
         request_json = self.google_handle.speech_to_text_api(base64.b64encode(audio_bytes_1channel)
-                                                               , self.sample_frequency)
+                                                               ,self.sample_frequency)
+
+        dict_output = {"success": False, "results": ()}
 
         if request_json:
             print(request_json)
+            dict_output["success"] = True
             recognition_result = str(request_json['results'][0]['alternatives'][0]['transcript'])
             confidence_result = float(request_json['results'][0]['alternatives'][0]['confidence'])
             language_result = request_json['results'][0]['languageCode']
 
             print("Request succeed, result: {}, confidence: {}".format(recognition_result, confidence_result))
-            return recognition_result, confidence_result, language_result
 
-        else:
+            dict_output["results"] = (recognition_result, language_result, confidence_result)
 
-            return None
+        return dict_output

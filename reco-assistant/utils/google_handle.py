@@ -20,15 +20,13 @@ class GoogleHandle(object):
         self.response_type = "code"
         self.scope = "email%20profile&"
 
-        self.key = "AIzaSyAsdGz-RdH5mAoN7yYOK2FjAIjC4vO95Tk"
+        self.key = ""
 
-        # self.read_credentials()
+        self.read_key()
 
-    def read_credentials(self):
-        with open(str(pathlib.Path.home()) + "/Téléchargements/credentials.json", 'r') as json_file:
-            json_data = json.load(json_file)["installed"]
-            self.client_id = json_data["client_id"]
-            self.redirect_uri = json_data["redirect_uris"][0]
+    def read_key(self):
+        with open(str(pathlib.Path.home()) + "/Reco-Assistant/reco-assistant/files/GoogleKey.txt", 'r') as key_file:
+            self.key = str(key_file.read())
 
     def certification(self):
         # auth_url = self.HOST_URL + self.AUTH_API
@@ -73,8 +71,8 @@ class GoogleHandle(object):
             return stt_request.json()
 
         else:
-            print("Request failed: status code: {}, error:{}".format(request_result.status_code,
-                                                                     request_result.reason))
+            print("Request failed: status code: {}, error:{}".format(stt_request.status_code,
+                                                                     stt_request.reason))
             return None
 
     def text_to_speech_api(self, text, language):

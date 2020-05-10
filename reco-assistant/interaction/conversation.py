@@ -25,20 +25,24 @@ class Conversation(object):
 
     def start_interaction(self):
 
-        result, confidence, language = self.recognition.start_recording()
+        recognition_dict = self.recognition.start_recognition()
 
-        print(self.keyword_list)
+        if recognition_dict["success"]:
 
-        answer = ""
+            result, language, confidence = recognition_dict["results"]
 
-        for index, keyword in enumerate(self.keyword_list):
-            if keyword+ " " in result:
-                print("start chatbot with keyword {}".format(keyword))
-                chatbot = self.chatbots_list[index]
-                answer = self.chatbots_list[index].get_answer(result, language)
+            print(self.keyword_list)
 
-        if answer:
-            print(answer)
-            answer_wav = base64.b64decode(self.google_hangle.text_to_speech_api(answer, language).encode('ascii'))
-            self.audio_player.play_from_wav_content(answer_wav)
+            answer = ""
+
+            for index, keyword in enumerate(self.keyword_list):
+                if keyword+ " " in result:
+                    print("start chatbot with keyword {}".format(keyword))
+                    chatbot = self.chatbots_list[index]
+                    answer = self.chatbots_list[index].get_answer(result, language)
+
+            if answer:
+                print(answer)
+                answer_wav = base64.b64decode(self.google_hangle.text_to_speech_api(answer, language).encode('ascii'))
+                self.audio_player.play_from_wav_content(answer_wav)
 
