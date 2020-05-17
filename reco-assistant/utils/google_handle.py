@@ -1,14 +1,18 @@
+from architecture.service_structure import ServiceStructure
+
 import requests
 import json
 import pathlib
 from urllib.parse import urlencode
 import base64
-import simplejson
 
 
-class GoogleHandle(object):
+class GoogleHandle(ServiceStructure):
 
-    def __init__(self):
+    def __init__(self, services_handle):
+        super().__init__(services_handle)
+        self.name = "GoogleHandle"
+
         self.connection_token = ""
         self.refresh_token = ""
         self.expiration_timestamp = 0

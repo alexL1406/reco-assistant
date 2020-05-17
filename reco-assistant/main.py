@@ -1,17 +1,16 @@
 # -*- coding: utf-8 -*-
-
+from architecture.services_handle import ServicesHandle
 from interaction.conversation import Conversation
 from utils.audio_player import AudioPlayer
 from utils.google_handle import GoogleHandle
 
 if __name__ == '__main__':
 
-    audio_player = AudioPlayer()
+    services_handle = ServicesHandle()
 
-    print("Init Conversation ")
+    print("Init Services ")
+    services_handle.start_services()
 
-    conversation = Conversation(audio_player)
-
-    print("Start Conversation")
-
-    conversation.start_interaction()
+    while True:
+        input("Pres ENTER to start the recognition")
+        services_handle.conversation.start_interaction()

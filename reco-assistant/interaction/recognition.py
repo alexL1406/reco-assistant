@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
+from architecture.service_structure import ServiceStructure
 
 import audioop
 import pyaudio
 import wave
 import threading
 import pathlib
-from utils.google_handle import GoogleHandle
 import base64
 
 
@@ -16,10 +16,12 @@ class RecognitionStates:
     IDLE = "IDLE"
 
 
-class Recognition(object):
+class Recognition(ServiceStructure):
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, services_handle):
+        super().__init__(services_handle)
+        self.name = "Recognition"
+
         self.chunk = 1024  # Record in chunks of 1024 samples
         self.sample_format = pyaudio.paInt16  # 16 bits per sample
         self.channels = 4
@@ -42,7 +44,13 @@ class Recognition(object):
         self.detect_eos_thread = None
         self.write_to_files_thread = None
 
-        self.google_handle = GoogleHandle()
+        self.google_handle = self.services.google_handle
+        self.audio_player = self.services.audio_player
+
+    def __del__(self):
+
+        # Terminate the PortAudio interface
+        self.pyAudio_interface.terminate()
 
     def start_recognition(self):
         print("Initialize Audio Stream")
@@ -83,13 +91,11 @@ class Recognition(object):
 
         audio_bytes = self.stop_recording()
 
-        self.write_to_files_thread = threading.Thread(target=lambda: self.write_to_file(audio_bytes))
+        self.write_to_files_thread = threading.Thread(target=lambda: self.services.audio_player.write_to_file_from_bytes(
+            audio_bytes, self.channels, self.filename))
         self.write_to_files_thread.start()
 
         return self.get_recognition_result()
-
-    def start_recording_thread(self):
-        self.recording_thread.start()
 
     def switch_recording_state(self, state):
         self.recognition_state = state
@@ -128,13 +134,10 @@ class Recognition(object):
         # Stop and close the stream
         self.stream.stop_stream()
         self.stream.close()
-        # Terminate the PortAudio interface
-        self.pyAudio_interface.terminate()
 
         return b''.join(self.audio_fragment_array)
 
     def write_to_file(self, audio_bytes):
-
         print('Writing in file')
         # Save the recorded data as a WAV file
         wf = wave.open(self.filename, 'wb')
@@ -152,7 +155,7 @@ class Recognition(object):
         audio_bytes_1channel = audioop.tomono(audio_bytes_2channels, 2, 0.5, 0.5)
 
         print("Start speech interaction request to google")
-        request_json = self.google_handle.speech_to_text_api(base64.b64encode(audio_bytes_1channel)
+        request_json = self.services.google_handle.speech_to_text_api(base64.b64encode(audio_bytes_1channel)
                                                                ,self.sample_frequency)
 
         dict_output = {"success": False, "results": ()}

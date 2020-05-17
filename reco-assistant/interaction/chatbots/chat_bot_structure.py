@@ -7,13 +7,15 @@ from threading import Thread
 
 class ChatBotStucture(object):
 
-    def __init__(self, find_number):
+    def __init__(self, services, find_number):
 
         self.keyword = ""
         self.identifiers_list = []
         self.speech_dict = {}
         self.behavior_thread = None
         self.behavior_started = False
+
+        self.services = services
         self.find_number = find_number
 
     def get_speech_dict(self, recognition_result, language):

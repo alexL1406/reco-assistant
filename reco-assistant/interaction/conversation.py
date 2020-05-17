@@ -1,31 +1,28 @@
-from interaction.recognition import Recognition
+from architecture.service_structure import ServiceStructure
 from interaction.chatbots.minuteur_chatbot import MinuteurChatBot
-from utils.minuteur import Minuteur
-from utils.google_handle import GoogleHandle
 
 import base64
 
-class Conversation(object):
 
-    def __init__(self, audio_player):
-        self.audio_player = audio_player
-        self.recognition = Recognition()
+class Conversation(ServiceStructure):
+
+    def __init__(self, services_handle):
+        super().__init__(services_handle)
+        self.name = "Conversation"
+
         self.configuration_json = None
         self.chatbots_list = []
         self.keyword_list = []
 
-        self.minuteur = Minuteur(self.audio_player)
-        self.google_hangle = GoogleHandle()
-
         self.set_configuration()
 
     def set_configuration(self):
-        self.chatbots_list = [MinuteurChatBot(self.minuteur, find_number=True)]
+        self.chatbots_list = [MinuteurChatBot(self.services, find_number=True)]
         self.keyword_list = [chatbot.keyword for chatbot in self.chatbots_list]
 
     def start_interaction(self):
 
-        recognition_dict = self.recognition.start_recognition()
+        recognition_dict = self.services.recognition.start_recognition()
 
         if recognition_dict["success"]:
 
@@ -43,6 +40,6 @@ class Conversation(object):
 
             if answer:
                 print(answer)
-                answer_wav = base64.b64decode(self.google_hangle.text_to_speech_api(answer, language).encode('ascii'))
-                self.audio_player.play_from_wav_content(answer_wav)
+                answer_wav = base64.b64decode(self.services.google_handle.text_to_speech_api(answer, language).encode('ascii'))
+                self.services.audio_player.play_from_wav_content(answer_wav)
 

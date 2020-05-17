@@ -1,14 +1,18 @@
 import os
+from architecture.service_structure import ServiceStructure
+
 from subprocess import run, Popen, PIPE
 from threading import Thread
 import wave
 import pathlib
 
 
+class AudioPlayer(ServiceStructure):
 
-class AudioPlayer(object):
+    def __init__(self, services_handle):
+        super().__init__(services_handle)
 
-    def __init__(self):
+        self.name = "AudioPlayer"
         self.sample_frequency = 44100
         self.sample_width = 2
         thread = Thread(target=self.start_jack_server())
@@ -33,7 +37,7 @@ class AudioPlayer(object):
 
         print("end of jack server")
 
-    def write_to_file_from_bytes(self, audio_bytes, path, channels):
+    def write_to_file_from_bytes(self, audio_bytes, channels, path):
 
         print('Writing in file')
         # Save the recorded data as a WAV file

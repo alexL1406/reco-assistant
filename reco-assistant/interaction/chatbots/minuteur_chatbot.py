@@ -7,11 +7,9 @@ import time
 
 class MinuteurChatBot(ChatBotStucture):
 
-    def __init__(self, minuteur, find_number=False):
+    def __init__(self, services, find_number=False):
 
-        super().__init__(find_number)
-
-        self.minuteur = minuteur
+        super().__init__(services, find_number)
 
         self.keyword = "minuteur"
 
@@ -40,9 +38,9 @@ class MinuteurChatBot(ChatBotStucture):
                 converter = 3600
 
             print("duration {} * {}".format(list_duration[0], converter))
-            self.minuteur.update_duration(list_duration[0]*converter)
+            self.services.minuteur.update_duration(list_duration[0]*converter)
 
-            self.run_behavior(lambda: self.minuteur.start_minuteur())
+            self.run_behavior(lambda: self.services.minuteur.start_minuteur())
 
             return "c'est parti pour {} {}".format(list_duration[0], list_time_unity[0])
 

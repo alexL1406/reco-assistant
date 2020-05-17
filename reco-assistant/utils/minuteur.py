@@ -1,11 +1,13 @@
 import time
-import os
 import pathlib
+from architecture.service_structure import ServiceStructure
 
-class Minuteur(object):
+class Minuteur(ServiceStructure):
 
-    def __init__(self, audio_player):
-        self.audio_player = audio_player
+    def __init__(self, services_handle):
+
+        super().__init__(services_handle)
+        self.name = "Minuteur"
         self.duration = 0
         self.running = False
         self.file_directory = str(pathlib.Path.home()) + "/Reco-Assistant/reco-assistant/files/"
@@ -27,5 +29,5 @@ class Minuteur(object):
 
         time.sleep(self.duration)
 
-        self.audio_player.play_sound(self.alarm_file)
+        self.services.audio_player.play_sound(self.alarm_file)
         self.running = False
