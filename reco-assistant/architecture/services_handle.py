@@ -1,6 +1,7 @@
 from enum import Enum
 from interaction import conversation, recognition
 from utils import audio_player, google_handle, minuteur
+from leds import leds
 
 
 class ServicesHandle(object):
@@ -12,10 +13,12 @@ class ServicesHandle(object):
         self.audio_player = None
         self.google_handle = None
         self.minuteur = None
+        self.leds = None
 
     def start_services(self):
 
         print("start services")
+        self.leds = leds.Leds(self)
         self.conversation = conversation.Conversation(self)
         self.recognition = recognition.Recognition(self)
         self.audio_player = audio_player.AudioPlayer(self)

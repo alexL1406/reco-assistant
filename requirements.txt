@@ -3,3 +3,5 @@ wave
 request
 pydub
 simplejson
+spidev
+gpiozero

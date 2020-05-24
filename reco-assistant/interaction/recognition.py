@@ -70,7 +70,7 @@ class Recognition(ServiceStructure):
         print("Initial RMS {}".format(self.previous_rms))
 
         print("Start recording")
-        self.switch_recording_state(RecognitionStates.SPEECH_DETECTION)
+        self.switch_recognition_state(RecognitionStates.SPEECH_DETECTION)
 
         while (self.recognition_state == RecognitionStates.SPEECH_DETECTION
                or self.recognition_state == RecognitionStates.RECORDING):
@@ -97,21 +97,22 @@ class Recognition(ServiceStructure):
 
         return self.get_recognition_result()
 
-    def switch_recording_state(self, state):
+    def switch_recognition_state(self, state):
         self.recognition_state = state
-        print("Recording state: {}".format(state))
+        self.services.leds.set_mode(state)
+        print("Recognition state: {}".format(state))
 
     def detect_bos(self, fragment):
         rms_rate = self.calculate_rms_rate(fragment)
 
         if rms_rate > self.RMS_THRESHOlD_UP:
-            self.switch_recording_state(RecognitionStates.RECORDING)
+            self.switch_recognition_state(RecognitionStates.RECORDING)
 
     def detect_eos(self, fragment):
         rms_rate = self.calculate_rms_rate(fragment)
 
         if rms_rate < self.RMS_THRESHOlD_DOWN:
-            self.switch_recording_state(RecognitionStates.PROCESSING)
+            self.switch_recognition_state(RecognitionStates.PROCESSING)
 
     def calculate_rms_rate(self, fragment):
         rms = audioop.rms(fragment, self.channels)

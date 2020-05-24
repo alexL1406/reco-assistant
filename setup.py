@@ -10,7 +10,7 @@ install_requires = required
 
 setuptools.setup(
     name="reco-assistant",
-    version="0.6.0",
+    version="0.7.0",
     author="alexL1406",
     author_email="leurent.alexis@gmail.com",
     description="Reco-Assistant",
